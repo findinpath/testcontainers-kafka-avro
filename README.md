@@ -9,7 +9,7 @@ Kafka with the help of [docker](https://www.docker.com/) containers
 The [testcontainers](https://www.testcontainers.org/) library already
 offers a [Kafka](https://www.testcontainers.org/modules/kafka/) module
 for interacting with [Apache Kafka](https://kafka.apache.org/), but
-it there is, at the moment, not an testcontainer module for the whole
+it there is, at the moment, not an testcontainers module for the whole
 Confluent environment (Confluent Schema Registry container support is
 missing from the module previously mentioned).
 As a side note, the containers used do not use the default ports exposed
