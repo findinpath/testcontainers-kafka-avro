@@ -1,0 +1,16 @@
+{
+  "type" : "record",
+  "name" : "BookmarkEvent",
+  "namespace" : "com.findinpath.avro",
+  "fields" : [ {
+    "name" : "userUuid",
+    "type" : "string"
+  }, {
+    "name" : "url",
+    "type" : "string"
+  }, {
+    "name" : "timestamp",
+    "type" : "long",
+    "logicalType" : "timestamp-millis"
+  }]
+}
