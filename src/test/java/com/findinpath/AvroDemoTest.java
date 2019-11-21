@@ -48,6 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
+import org.testcontainers.lifecycle.Startables;
 
 /**
  * This is a showcase on how to test the serialization/deserialization of AVRO messages over Apache
@@ -95,15 +96,9 @@ public class AvroDemoTest {
     schemaRegistryContainer = new SchemaRegistryContainer(zookeeperContainer.getZookeeperConnect())
         .withNetwork(network);
 
-    Runtime.getRuntime()
-        .addShutdownHook(new Thread(() ->
-                Arrays.asList(zookeeperContainer, kafkaContainer, schemaRegistryContainer)
-                    .parallelStream().forEach(GenericContainer::stop)
-            )
-        );
-
-    Stream.of(zookeeperContainer, kafkaContainer, schemaRegistryContainer).parallel()
-        .forEach(GenericContainer::start);
+    Startables
+        .deepStart(Stream.of(zookeeperContainer, kafkaContainer, schemaRegistryContainer))
+        .join();
 
     createTopics();
     registerSchemaRegistryTypes();
