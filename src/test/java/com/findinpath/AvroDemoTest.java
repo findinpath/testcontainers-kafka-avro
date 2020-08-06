@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
@@ -46,7 +44,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.lifecycle.Startables;
 
@@ -91,9 +88,9 @@ public class AvroDemoTest {
     network = Network.newNetwork();
     zookeeperContainer = new ZookeeperContainer()
         .withNetwork(network);
-    kafkaContainer = new KafkaContainer(zookeeperContainer.getZookeeperConnect())
+    kafkaContainer = new KafkaContainer(zookeeperContainer.getInternalUrl())
         .withNetwork(network);
-    schemaRegistryContainer = new SchemaRegistryContainer(zookeeperContainer.getZookeeperConnect())
+    schemaRegistryContainer = new SchemaRegistryContainer(zookeeperContainer.getInternalUrl())
         .withNetwork(network);
 
     Startables
@@ -150,7 +147,7 @@ public class AvroDemoTest {
     props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
     props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
     props.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG,
-        schemaRegistryContainer.getServiceURL());
+        schemaRegistryContainer.getUrl());
     props.put(KafkaAvroSerializerConfig.VALUE_SUBJECT_NAME_STRATEGY,
         TopicNameStrategy.class.getName());
 
@@ -203,7 +200,7 @@ public class AvroDemoTest {
     props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "1000");
     props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
     props.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG,
-        schemaRegistryContainer.getServiceURL());
+        schemaRegistryContainer.getUrl());
     props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
     props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class);
     props.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, true);
@@ -226,7 +223,7 @@ public class AvroDemoTest {
     // to setup the tests.
     LOGGER.info("Registering manually in the Schema Registry the types used in the tests");
     var schemaRegistryClient = new CachedSchemaRegistryClient(
-        schemaRegistryContainer.getServiceURL(), 1000);
+        schemaRegistryContainer.getUrl(), 1000);
     schemaRegistryClient
         .register(BookmarkEvent.getClassSchema().getFullName(), BookmarkEvent.getClassSchema());
   }
